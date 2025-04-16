@@ -1,3 +1,4 @@
+import datetime
 import os
 
 
@@ -19,6 +20,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'django_filters',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -96,3 +98,9 @@ REST_FRAMEWORK = {
         ],
         'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
     }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=24),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    # Можно добавить другие опции по желанию
+}
