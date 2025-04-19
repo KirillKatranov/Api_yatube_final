@@ -42,11 +42,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         post_id = self.kwargs.get('post_pk')
-        post = get_object_or_404(Post, pk=post_id)
+        post = get_object_or_404(Post, pk=post_id)#?
         SerializerClass = self.get_serializer_class()
         serializer: CommentWriteSerializer = SerializerClass(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save(author=request.user, post=post)
+            serializer.save(author=request.user, post=post)#?
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
