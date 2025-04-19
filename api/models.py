@@ -36,5 +36,4 @@ class Comment(models.Model):
 
 
 class Follow(models.Model):
-    pass
-
+    pass 
