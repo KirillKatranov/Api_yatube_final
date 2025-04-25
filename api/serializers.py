@@ -22,9 +22,10 @@ class CommentWriteSerializer(serializers.ModelSerializer):
         fields = ('id', 'text')
 
 class CommentReadSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField()
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'author', 'posts','created')
+        fields = ('id', 'text', 'author', 'created')
 
 class GroupSerializer(serializers.ModelSerializer): 
     class Meta:

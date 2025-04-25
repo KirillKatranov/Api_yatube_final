@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
 post_router = DefaultRouter()
 post_router.register(r'posts', PostViewSet, basename='post')
 group_router = DefaultRouter()
-group_router.register(r'groups', GroupViewSet, basename='groups')
+group_router.register(r'group', GroupViewSet, basename='groups')
 
 comment_router = routers.NestedDefaultRouter(post_router, r'posts', lookup='post')
 comment_router.register(r'comments', CommentViewSet, basename='post-comments')
