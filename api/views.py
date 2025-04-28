@@ -25,14 +25,6 @@ class PostViewSet(viewsets.ModelViewSet):
         return PostWriteSerializer
 
     
-    def create(self, request):
-        SerializerClass = self.get_serializer_class()
-        serializer: PostWriteSerializer = SerializerClass(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
         
@@ -42,29 +34,28 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
+    permission_classes = (OwnerOrReadOnly,)
 
     def get_queryset(self):
-        pk = self.kwargs.get('post_pk')
-        return Comment.objects.filter(pk=pk)
+        post_id = self.kwargs.get('post_pk')
+        return Comment.objects.filter(post_id=post_id)
     
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return CommentReadSerializer
         return CommentWriteSerializer
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         post_id = self.kwargs.get('post_pk')
-        post = get_object_or_404(Post, pk=post_id)#?
+        post = get_object_or_404(Post, pk=post_id)
+        if post.author != self.request.user:
+            return Response({"detail": "You do not have permission to edit this post."}, status=403)
+        serializer.save(author=self.request.user, post=post)
     
-        SerializerClass = self.get_serializer_class()
-        serializer: CommentWriteSerializer = SerializerClass(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(author=request.user, post=post)#?
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class GroupViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (OwnerOrReadOnly,)
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
