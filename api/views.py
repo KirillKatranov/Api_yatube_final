@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Follow, Post, Comment, Group
+from .models import Follow, Post, Comment, Group, User
 from .serializers import (CommentReadSerializer, CommentWriteSerializer, PostReadSerializer, 
                           GroupSerializer, FollowSerializer, PostWriteSerializer)
 from .permissions import OwnerOrReadOnly
@@ -61,4 +61,27 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class FollowViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('user__username',)
+
+    def get_queryset(self):
+        return Follow.objects.filter(following__username=self.request.user.username)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data["following"]
+        exist_object = Follow.objects.filter(user=request.user, following__username=username)
+        if exist_object:
+            return Response(data="Такая подписка уже есть", status=400)
+        following_user = get_object_or_404(User, username=username)
+        if request.user == following_user:
+            return Response(data="На себя подписываться нельзя", status=400)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

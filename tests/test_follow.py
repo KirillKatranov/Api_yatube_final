@@ -38,7 +38,7 @@ class TestFollowAPI:
         assert len(test_data) == Follow.objects.filter(following__username='TestUser').count(), \
             'Проверьте, что при GET запросе на `/api/v1/follow/` возвращается список всех подписчиков пользователя'
 
-        follow = Follow.objects.filter(following__username=user.username)[0]
+        follow = Follow.objects.filter(following__username=user.username)[0]#Запись которая хранит первого подписчика на TestUser
         test_group = test_data[0]
         assert 'user' in test_group, \
             'Проверьте, что добавили `user` в список полей `fields` сериализатора модели Follow'

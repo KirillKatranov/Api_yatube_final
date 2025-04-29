@@ -10,6 +10,8 @@ post_router = DefaultRouter()
 post_router.register(r'posts', PostViewSet, basename='post')
 group_router = DefaultRouter()
 group_router.register(r'group', GroupViewSet, basename='groups')
+follow_router= DefaultRouter()
+post_router.register(r'follow', FollowViewSet, basename='follow')
 
 comment_router = routers.NestedDefaultRouter(post_router, r'posts', lookup='post')
 comment_router.register(r'comments', CommentViewSet, basename='post-comments')
@@ -18,6 +20,8 @@ urlpatterns = [
     path('v1/', include(post_router.urls)),
     path('v1/',  include(group_router.urls)),
     path('v1/',  include(comment_router.urls)),
+    path('v1/', include(follow_router.urls)), #
     path('v1/', include('djoser.urls')),  # Работа с пользователями
-    path('v1/', include('djoser.urls.jwt')), #
+    path('v1/', include('djoser.urls.jwt')),
+
 ]

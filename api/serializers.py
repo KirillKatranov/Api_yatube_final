@@ -35,4 +35,12 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 class FollowSerializer(serializers.ModelSerializer):
-    pass
+    following = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all()
+    )
+    user = serializers.StringRelatedField()
+    class Meta:
+        model = Follow
+        fields = ('id', 'following', 'user')
+        read_only_fields = ('user',)
